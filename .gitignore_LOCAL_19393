@@ -1,0 +1,11 @@
+/learning_django/settings.pyc
+/learning_django/urls.pyc
+/learning_django/wsgi.pyc
+
+/learning-django-env/
+
+/polls/__init__.pyc
+/polls/urls.pyc
+/polls/views.pyc
+
+db_info.md
