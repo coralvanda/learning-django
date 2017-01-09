@@ -6,8 +6,14 @@
 /learning-django-env/
 
 /polls/__init__.pyc
+/polls/admin.pyc
+/polls/apps.pyc
+/polls/models.pyc
 /polls/urls.pyc
 /polls/views.pyc
+/polls/migrations/0001_initial.py
+/polls/migrations/0001_initial.pyc
+/polls/migrations/__init__.pyc
 
 db_info.md
 db.sqlite3
