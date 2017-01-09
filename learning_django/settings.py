@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ["138.197.26.104", "learning-django.coralvanda.com"]
 # Application definition
 
 INSTALLED_APPS = [
+    'polls.apps.PollsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
