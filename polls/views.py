@@ -14,7 +14,7 @@ def index(request):
 def detail(request, question_id):
 	"""Shows info for a specific question based on its ID number"""
 	question = get_object_or_404(Question, pk=question_id)
-	return render(request, 'polls/detail.html', {'qusetion': question})
+	return render(request, 'polls/detail.html', {'question': question})
 
 def results(request, question_id):
 	"""Shows results for a specific question based on its ID number"""
