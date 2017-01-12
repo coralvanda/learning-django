@@ -62,7 +62,7 @@ class ResultsView(generic.DetailView):
 			any questions without a choice
 		"""
 		choices = Choice.objects.prefetch_related(
-			'question').filter(question=question_id)
+			'question').distinct('question')
 		question_ids = [x.question.id for x in choices]
 		questions = Question.objects.filter(
 			pk__in=question_ids).filter(
