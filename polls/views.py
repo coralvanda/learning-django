@@ -24,10 +24,8 @@ class IndexView(generic.ListView):
 			'question').distinct('qusetion')
 		question_ids = [x.question.id for x in choices]
 		return Question.objects.filter(
-			id__in=question_ids).order_by(
-			).filter(
-			pub_date__lte=timezone.now()
-			'-pub_date')[:5]
+			id__in=question_ids).filter(
+			pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
 
 
 class DetailView(generic.DetailView):
