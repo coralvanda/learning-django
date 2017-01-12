@@ -10,6 +10,9 @@ from django.utils.encoding import python_2_unicode_compatible
 
 @python_2_unicode_compatible
 class Question(models.Model):
+	"""
+		The DB model for a poll question
+	"""
 	question_text = models.CharField(max_length=200)
 	pub_date = models.DateTimeField('date published')
 
@@ -23,6 +26,9 @@ class Question(models.Model):
 
 @python_2_unicode_compatible
 class Choice(models.Model):
+	"""
+		The DB model for a possible choice linked to a question
+	"""
 	question = models.ForeignKey(Question, on_delete=models.CASCADE)
 	choice_text = models.CharField(max_length=200)
 	votes = models.IntegerField(default=0)
