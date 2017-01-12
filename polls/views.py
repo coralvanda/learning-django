@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.urls import reverse
 from django.views import generic
 from django.db.models import F
@@ -18,11 +18,16 @@ class IndexView(generic.ListView):
 	def get_queryset(self):
 		"""
 			Return the last five published questions (not including those
-			set to be published in the future
+			set to be published in the future or ones without a choice)
 		"""
+		choices = Choice.objects.prefetch_related(
+			'question').distinct('qusetion')
+		question_ids = [x.question.id for x in choices]
 		return Question.objects.filter(
+			id__in=question_ids).order_by(
+			).filter(
 			pub_date__lte=timezone.now()
-			).order_by('-pub_date')[:5]
+			'-pub_date')[:5]
 
 
 class DetailView(generic.DetailView):
@@ -34,9 +39,17 @@ class DetailView(generic.DetailView):
 
 	def get_queryset(self):
 		"""
-			Excludes any questions that aren't published yet
+			Excludes any questions that aren't published yet, and
+			any questions without a choice
 		"""
-		return Question.objects.filter(pub_date__lte=timezone.now())
+		choices = Choice.objects.filter(question=question_id)
+		try:
+			question = Question.objects.filter(
+				pk=choices[0].question.id).filter(
+				pub_date__lte=timezone.now())
+			return question
+		except IndexError:
+			return Http404
 
 
 class ResultsView(generic.DetailView):
@@ -48,9 +61,17 @@ class ResultsView(generic.DetailView):
 
 	def get_queryset(self):
 		"""
-			Excludes any questions that aren't published yet
+			Excludes any questions that aren't published yet, and
+			any questions without a choice
 		"""
-		return Question.objects.filter(pub_date__lte=timezone.now())
+		choices = Choice.objects.filter(question=question_id)
+		try:
+			question = Question.objects.filter(
+				pk=choices[0].question.id).filter(
+				pub_date__lte=timezone.now())
+			return question
+		except IndexError:
+			return Http404
 
 
 def vote(request, question_id):
