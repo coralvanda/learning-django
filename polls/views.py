@@ -46,7 +46,7 @@ class DetailView(generic.DetailView):
 		questions = Question.objects.filter(
 			id__in=question_ids).filter(
 			pub_date__lte=timezone.now())
-		return question
+		return questions
 
 
 class ResultsView(generic.DetailView):
@@ -64,10 +64,10 @@ class ResultsView(generic.DetailView):
 		choices = Choice.objects.prefetch_related(
 			'question').filter(question=question_id)
 		question_ids = [x.question.id for x in choices]
-		question = Question.objects.filter(
+		questions = Question.objects.filter(
 			pk__in=question_ids).filter(
 			pub_date__lte=timezone.now())
-		return question
+		return questions
 
 
 def vote(request, question_id):
