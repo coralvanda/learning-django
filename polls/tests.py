@@ -109,6 +109,16 @@ class QuestionViewTests(TestCase):
 			response.context['latest_question_list'],
 			['<Question: Past question 2.>', '<Question: Past question 1.>'])
 
+	def test_index_view_with_question_that_has_no_choice(self):
+		"""
+			Questions that do not have at least 1 choice should not
+			be displayed
+		"""
+		create_question(question_text="No choice.", days=-5, have_choice=False)
+		response = self.client.get(reverse('polls:index'))
+		self.assertContains(response, "No polls are available.")
+		self.assertQuerysetEqual(response.context['latest_question_list'], [])
+
 
 class QuestionIndexDetailTests(TestCase):
 
@@ -134,6 +144,17 @@ class QuestionIndexDetailTests(TestCase):
 		response = self.client.get(url)
 		self.assertContains(response, past_question.question_text)
 
+	def test_detail_view_with_question_that_has_no_choice(self):
+		"""
+			The detail view of a question without at least 1 choice
+			should return a 404 not found
+		"""
+		no_choice_question = create_question(
+			question_text="No choice.", days=-5, have_choice=False)
+		url = reverse('polls:detail', args=(no_choice_question.id,))
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 404)
+
 
 class QuestionIndexResultTests(TestCase):
 
@@ -158,3 +179,14 @@ class QuestionIndexResultTests(TestCase):
 		url = reverse('polls:results', args=(past_question.id,))
 		response = self.client.get(url)
 		self.assertContains(response, past_question.question_text)
+
+	def test_results_view_with_question_that_has_no_choice(self):
+		"""
+			The results view of a question without at least 1 choice
+			should return a 404 not found
+		"""
+		no_choice_question = create_question(
+			question_text="No choice.", days=-5, have_choice=False)
+		url = reverse('polls:results', args=(no_choice_question.id,))
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 404)
