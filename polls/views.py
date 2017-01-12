@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.urls import reverse
 from django.views import generic
-from django.db.models import F
+from django.db.models import F, Count
 from django.utils import timezone
 
 from .models import Choice, Question
@@ -20,12 +20,11 @@ class IndexView(generic.ListView):
 			Return the last five published questions (not including those
 			set to be published in the future or ones without a choice)
 		"""
-		choices = Choice.objects.prefetch_related(
-			'question').distinct('question')
-		question_ids = [x.question.id for x in choices]
-		return Question.objects.filter(
-			id__in=question_ids).filter(
-			pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
+		return Question.objects \
+			.annotate(choice_cnt=Count('choice')) \
+			.exclude(choice_cnt=0) \
+			.filter(pub_date__lte=timezone.now()) \
+			.order_by('-pub_date')[:5]
 
 
 class DetailView(generic.DetailView):
@@ -40,13 +39,10 @@ class DetailView(generic.DetailView):
 			Excludes any questions that aren't published yet, and
 			any questions without a choice
 		"""
-		choices = Choice.objects.prefetch_related(
-			'question').distinct('question')
-		question_ids = [x.question.id for x in choices]
-		questions = Question.objects.filter(
-			id__in=question_ids).filter(
-			pub_date__lte=timezone.now())
-		return questions
+		return Question.objects \
+			.annotate(choice_cnt=Count('choice')) \
+			.exclude(choice_cnt=0) \
+			.filter(pub_date__lte=timezone.now())
 
 
 class ResultsView(generic.DetailView):
@@ -61,13 +57,10 @@ class ResultsView(generic.DetailView):
 			Excludes any questions that aren't published yet, and
 			any questions without a choice
 		"""
-		choices = Choice.objects.prefetch_related(
-			'question').distinct('question')
-		question_ids = [x.question.id for x in choices]
-		questions = Question.objects.filter(
-			pk__in=question_ids).filter(
-			pub_date__lte=timezone.now())
-		return questions
+		return Question.objects \
+			.annotate(choice_cnt=Count('choice')) \
+			.exclude(choice_cnt=0) \
+			.filter(pub_date__lte=timezone.now())
 
 
 def vote(request, question_id):
