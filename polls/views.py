@@ -21,7 +21,7 @@ class IndexView(generic.ListView):
 			set to be published in the future or ones without a choice)
 		"""
 		choices = Choice.objects.prefetch_related(
-			'question').distinct('qusetion')
+			'question').distinct('question')
 		question_ids = [x.question.id for x in choices]
 		return Question.objects.filter(
 			id__in=question_ids).filter(
