@@ -4,16 +4,24 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from .models import Question
+from .models import Choice, Question
 
-def create_question(question_text, days):
+def create_question(question_text, days, have_choice=True):
 	"""
 		Creates a question with the given 'question_text' and publshed the
 		given number of 'days' offset to now (negative for questions published)
-		in the past, positive for questions that have yet to be published)
+		in the past, positive for questions that have yet to be published).
+		Automatically creates a choice for each question unless told not to
 	"""
 	time = timezone.now() + datetime.timedelta(days=days)
-	return Question.objects.create(question_text=question_text, pub_date=time)
+	question = Question.objects.create(
+		question_text=question_text, pub_date=time)
+	if have_choice:
+		choice = Choice.objects.create(
+			question = question.id,
+			choice_text = "Choice",
+			votes = 0)
+	return question
 
 
 class QuestionMethodTests(TestCase):
