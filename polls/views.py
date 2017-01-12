@@ -40,14 +40,13 @@ class DetailView(generic.DetailView):
 			Excludes any questions that aren't published yet, and
 			any questions without a choice
 		"""
-		choices = Choice.objects.filter(question=question_id)
-		try:
-			question = Question.objects.filter(
-				pk=choices[0].question.id).filter(
-				pub_date__lte=timezone.now())
-			return question
-		except IndexError:
-			return Http404
+		choices = Choice.objects.prefetch_related(
+			'question').distinct('question')
+		question_ids = [x.question.id for x in choices]
+		questions = Question.objects.filter(
+			id__in=question_ids).filter(
+			pub_date__lte=timezone.now())
+		return question
 
 
 class ResultsView(generic.DetailView):
@@ -62,14 +61,13 @@ class ResultsView(generic.DetailView):
 			Excludes any questions that aren't published yet, and
 			any questions without a choice
 		"""
-		choices = Choice.objects.filter(question=question_id)
-		try:
-			question = Question.objects.filter(
-				pk=choices[0].question.id).filter(
-				pub_date__lte=timezone.now())
-			return question
-		except IndexError:
-			return Http404
+		choices = Choice.objects..prefetch_related(
+			'question').filter(question=question_id)
+		question_ids = [x.question.id for x in choices]
+		question = Question.objects.filter(
+			pk__in=question_ids).filter(
+			pub_date__lte=timezone.now())
+		return question
 
 
 def vote(request, question_id):
