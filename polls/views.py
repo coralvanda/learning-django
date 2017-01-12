@@ -61,7 +61,7 @@ class ResultsView(generic.DetailView):
 			Excludes any questions that aren't published yet, and
 			any questions without a choice
 		"""
-		choices = Choice.objects..prefetch_related(
+		choices = Choice.objects.prefetch_related(
 			'question').filter(question=question_id)
 		question_ids = [x.question.id for x in choices]
 		question = Question.objects.filter(
