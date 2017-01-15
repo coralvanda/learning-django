@@ -18,7 +18,7 @@ def create_question(question_text, days, have_choice=True):
 		question_text=question_text, pub_date=time)
 	if have_choice:
 		choice = Choice.objects.create(
-			question=question.id,
+			question=question,
 			choice_text="A choice")
 	return question
 
