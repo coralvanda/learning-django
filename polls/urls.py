@@ -14,4 +14,7 @@ urlpatterns = [
     	views.ResultsView.as_view(), name='results'),
     # ex: /polls/5/vote/
     url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
+    # ex: /polls/all/
+    url(r'^/all/$', views.AllQuestionsView, name='all'),
+    url(r'^/popular/$', views.PopularView, name='popular'),
 ]

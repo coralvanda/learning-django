@@ -83,3 +83,39 @@ def vote(request, question_id):
 		# user hits the Back button.
 		return HttpResponseRedirect(reverse('polls:results',
 			args=(question.id,)))
+
+
+class AllQuestionsView(generic.ListView): # test needed!!
+	"""
+		Displays a listing showing all poll questions
+	"""
+	template_name = 'polls/all-questions.html'
+	context_object_name = 'full_question_list'
+
+	def get_queryset(self):
+		"""
+			Return the last five published questions (not including those
+			set to be published in the future or ones without a choice)
+		"""
+		return Question.objects \
+			.annotate(choice_cnt=Count('choice')) \
+			.exclude(choice_cnt=0) \
+			.filter(pub_date__lte=timezone.now())
+
+
+class PopularView(generic.ListView): # needs test and proper query!!!
+	"""
+		Displays a list of the 5 most popular questions
+	"""
+	template_name = 'polls/popular-questions.html'
+	context_object_name = 'popular_question_list'
+
+	def get_queryset(self):
+		"""
+			Return the five most popular questions based on vote counts
+		"""
+		return Question.objects \
+			.annotate(choice_cnt=Count('choice')) \
+			.exclude(choice_cnt=0) \
+			.filter(pub_date__lte=timezone.now()) \
+			.order_by('-pub_date')[:5]
