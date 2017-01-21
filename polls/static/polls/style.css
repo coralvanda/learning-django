@@ -2,6 +2,12 @@ html {
 	background: white url("images/background.gif") no-repeat right bottom;
 }
 
+header {
+	width: 100%;
+	background-color: black;
+	color: white;
+}
+
 li a {
 	color: green;
 }
