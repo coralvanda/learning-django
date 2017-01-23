@@ -3,13 +3,16 @@
 </header>
 
 <nav>
+	<a href="http://coralvanda.com">
+		<div>Home</div>
+	</a>
 	 <a href="{% url 'polls:index' %}">
-	 	<div>Home/Latest Questions</div>
+	 	<div>Latest Questions</div>
 	 </a>
-	 <a href="">
+	 <a href="{% url 'polls:all' %}">
 	 	<div>All questions</div>
 	 </a>
-	 <a href="">
+	 <a href="{% url 'polls:popular' %}">
 	 	<div>Most popular</div>
 	 </a>
 </nav>
