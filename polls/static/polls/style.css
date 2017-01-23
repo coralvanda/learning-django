@@ -8,6 +8,11 @@ header {
 	color: white;
 }
 
+nav {
+	display: flex;
+	flex-wrap: wrap;
+}
+
 li a {
 	color: green;
 }
