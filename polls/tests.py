@@ -22,6 +22,23 @@ def create_question(question_text, days, have_choice=True):
 			choice_text="A choice")
 	return question
 
+def question_builder(number_of_normal_questions,
+					number_of_future_questions=0,
+					number_of_questions_with_no_choices=0):
+	question_response_text = []
+	for x in range(number_of_normal_questions):
+		create_question(
+			question_text="Past question " + str(x + 1) + ".", days=-30)
+		question_response_text.append(
+			"<Question: Past question " + str(x + 1) + ".>")
+	for x in range(number_of_future_questions):
+		create_question(
+			question_text="Future question " + str(x + 1) + ".", days=30)
+	for x in range(number_of_questions_with_no_choices):
+		create_question(
+			question_text="No choices.", days=-30, have_choice=False)
+	return question_response_text[::-1]
+
 
 class QuestionMethodTests(TestCase):
 
@@ -92,27 +109,21 @@ class QuestionViewTests(TestCase):
 			Even if both past and future questions exist, only past questions
 			should be displayed
 		"""
-		create_question(question_text="Past question.",
-			days=-30, have_choice=True)
-		create_question(question_text="Future question.",
-			days=30, have_choice=True)
+		response_text = question_builder(1, number_of_future_questions=1)
 		response = self.client.get(reverse('polls:index'))
 		self.assertQuerysetEqual(
 			response.context['latest_question_list'],
-			['<Question: Past question.>'])
+			response_text)
 
 	def test_index_view_with_two_past_questions(self):
 		"""
 			The questions index page may display multiple questions
 		"""
-		create_question(question_text="Past question 1.",
-			days=-30, have_choice=True)
-		create_question(question_text="Past question 2.",
-			days=-5, have_choice=True)
+		response_text = question_builder(2)
 		response = self.client.get(reverse('polls:index'))
 		self.assertQuerysetEqual(
 			response.context['latest_question_list'],
-			['<Question: Past question 2.>', '<Question: Past question 1.>'])
+			response_text)
 
 	def test_index_view_with_question_that_has_no_choice(self):
 		"""
@@ -195,3 +206,78 @@ class QuestionIndexResultTests(TestCase):
 		url = reverse('polls:results', args=(no_choice_question.id,))
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 404)
+
+
+class QuestionIndexAllTests(TestCase):
+
+	def test_all_view_with_no_questions(self):
+		"""
+			If no questions exist, an appropriate message should be displayed
+		"""
+		response = self.client.get(reverse('polls:all'))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "No polls are available.")
+		self.assertQuerysetEqual(response.context['full_question_list'], [])
+
+	def test_all_view_with_a_past_question(self):
+		"""
+			Questions with a pub_date in the past should be displayed
+			on the all page
+		"""
+		create_question(question_text="Past question.", days=-30)
+		response = self.client.get(reverse('polls:all'))
+		self.assertQuerysetEqual(
+			response.context['full_question_list'],
+			['<Question: Past question.>'])
+
+	def test_all_view_with_a_future_question(self):
+		"""
+			Questions with a pub_date in the future should not be displayed
+			on the all page
+		"""
+		create_question(question_text="Future question.", days=30)
+		response = self.client.get(reverse('polls:all'))
+		self.assertContains(response, "No polls are available.")
+		self.assertQuerysetEqual(response.context['full_question_list'], [])
+
+	def test_all_view_with_future_question_and_past_question(self):
+		"""
+			Even if both past and future questions exist, only past questions
+			should be displayed
+		"""
+		response_text = question_builder(1, number_of_future_questions=1)
+		response = self.client.get(reverse('polls:all'))
+		self.assertQuerysetEqual(
+			response.context['full_question_list'],
+			response_text)
+
+	def test_all_view_with_many_past_questions(self):
+		"""
+			The all page may display multiple questions
+		"""
+		response_text = question_builder(10)
+		response = self.client.get(reverse('polls:all'))
+		self.assertQuerysetEqual(
+			response.context['full_question_list'],
+			response_text)
+
+	def test_all_view_with_question_that_has_no_choice(self):
+		"""
+			Questions that do not have at least 1 choice should not
+			be displayed
+		"""
+		create_question(question_text="No choice.", days=-5, have_choice=False)
+		response = self.client.get(reverse('polls:all'))
+		self.assertContains(response, "No polls are available.")
+		self.assertQuerysetEqual(response.context['full_question_list'], [])
+
+	def text_all_view_with_many_questions_incl_future_and_choiceless(self):
+		"""
+			Displays all past questions, ignores future and choiceless questions
+		"""
+		response_text = question_builder(10, number_of_future_questions=1,
+			number_of_questions_with_no_choices=1)
+		response = self.client.get(reverse('polls:all'))
+		self.assertQuerysetEqual(
+			response.context['full_question_list'],
+			response_text)
