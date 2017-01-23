@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.urls import reverse
 from django.views import generic
-from django.db.models import F, Count
+from django.db.models import F, Count, Sum
 from django.utils import timezone
 
 from .models import Choice, Question
@@ -117,5 +117,6 @@ class PopularView(generic.ListView): # needs test and proper query!!!
 		return Question.objects \
 			.annotate(choice_cnt=Count('choice')) \
 			.exclude(choice_cnt=0) \
+			.annotate(votes=Sum('choice__votes')) \
 			.filter(pub_date__lte=timezone.now()) \
-			.order_by('-pub_date')[:5]
+			.order_by('-votes')[:5]
