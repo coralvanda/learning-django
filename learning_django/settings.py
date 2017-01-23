@@ -25,6 +25,8 @@ SECRET_KEY = 'PUT SECRET KEY HERE'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+ADMINS = (('Eric', 'coralvanda@gmail.com'),)
+
 ALLOWED_HOSTS = ["138.197.26.104", "learning-django.coralvanda.com"]
 
 
