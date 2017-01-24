@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.http import HttpResponse
 
 urlpatterns = [
+	url(r'^robots.txt$', lambda r: HttpResponse(
+		"User-agent: *\nDisallow: /", mimetype="text/plain")),
     url(r'^polls/', include('polls.urls')),
     url(r'^admin/', admin.site.urls),
 ]
