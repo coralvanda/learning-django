@@ -3,10 +3,12 @@
 /learning_django/urls.pyc
 /learning_django/wsgi.pyc
 /learning_django/__init__.pyc
+/learning_django/__pycache__/
 
 /learning-django-env/
 
 /polls/__init__.pyc
+/polls/__pycache__/
 /polls/admin.pyc
 /polls/apps.pyc
 /polls/models.pyc
@@ -16,7 +18,9 @@
 /polls/migrations/0001_initial.py
 /polls/migrations/0001_initial.pyc
 /polls/migrations/__init__.pyc
+/polls/migrations/__pycache__/
 
 db_info.md
 db.sqlite3
 deployment-check.md
+django_db
