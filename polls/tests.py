@@ -303,7 +303,7 @@ class QuestionPopularViewTests(TestCase):
 		response = self.client.get(reverse('polls:popular'))
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "No polls are available.")
-		self.assertQuerysetEqual(response.context['full_question_list'], [])
+		self.assertQuerysetEqual(response.context['popular_question_list'], [])
 
 	def test_popular_view_with_a_past_question(self):
 		"""
@@ -313,7 +313,7 @@ class QuestionPopularViewTests(TestCase):
 		create_question(question_text="Past question.", days=-30)
 		response = self.client.get(reverse('polls:popular'))
 		self.assertQuerysetEqual(
-			response.context['full_question_list'],
+			response.context['popular_question_list'],
 			['<Question: Past question.>'])
 
 	def test_popular_view_with_a_future_question(self):
@@ -324,7 +324,7 @@ class QuestionPopularViewTests(TestCase):
 		create_question(question_text="Future question.", days=30)
 		response = self.client.get(reverse('polls:popular'))
 		self.assertContains(response, "No polls are available.")
-		self.assertQuerysetEqual(response.context['full_question_list'], [])
+		self.assertQuerysetEqual(response.context['popular_question_list'], [])
 
 	def test_popular_view_with_future_question_and_past_question(self):
 		"""
@@ -334,7 +334,7 @@ class QuestionPopularViewTests(TestCase):
 		response_text = question_builder(1, number_of_future_questions=1)
 		response = self.client.get(reverse('polls:popular'))
 		self.assertQuerysetEqual(
-			response.context['full_question_list'],
+			response.context['popular_question_list'],
 			response_text)
 
 	def test_popular_view_with_many_past_questions(self):
@@ -344,7 +344,7 @@ class QuestionPopularViewTests(TestCase):
 		response_text = question_builder(10)
 		response = self.client.get(reverse('polls:popular'))
 		self.assertQuerysetEqual(
-			response.context['full_question_list'],
+			response.context['popular_question_list'],
 			response_text)
 
 	def test_popular_view_with_question_that_has_no_choice(self):
@@ -355,7 +355,7 @@ class QuestionPopularViewTests(TestCase):
 		create_question(question_text="No choice.", days=-5, have_choice=False)
 		response = self.client.get(reverse('polls:popular'))
 		self.assertContains(response, "No polls are available.")
-		self.assertQuerysetEqual(response.context['full_question_list'], [])
+		self.assertQuerysetEqual(response.context['popular_question_list'], [])
 
 	def test_popular_view_with_many_questions_incl_future_and_choiceless(self):
 		"""
@@ -366,7 +366,7 @@ class QuestionPopularViewTests(TestCase):
 			number_of_questions_with_no_choices=1)
 		response = self.client.get(reverse('polls:popular'))
 		self.assertQuerysetEqual(
-			response.context['full_question_list'],
+			response.context['popular_question_list'],
 			response_text[:5])
 
 	def test_popular_view_with_many_questions_some_with_votes(self):

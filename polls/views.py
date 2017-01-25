@@ -100,7 +100,8 @@ class AllQuestionsView(generic.ListView):
 		return Question.objects \
 			.annotate(choice_cnt=Count('choice')) \
 			.exclude(choice_cnt=0) \
-			.filter(pub_date__lte=timezone.now())
+			.filter(pub_date__lte=timezone.now()) \
+			.order_by('-pub_date')
 
 
 class PopularView(generic.ListView): # needs tests!!!
