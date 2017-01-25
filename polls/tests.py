@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from .models import Choice, Question
 
-def create_question(question_text, days, have_choice=True):
+def create_question(question_text, days, have_choice=True, votes=False):
 	"""
 		Creates a question with the given 'question_text' and publshed the
 		given number of 'days' offset to now (negative for questions published)
@@ -17,14 +17,21 @@ def create_question(question_text, days, have_choice=True):
 	question = Question.objects.create(
 		question_text=question_text, pub_date=time)
 	if have_choice:
-		choice = Choice.objects.create(
-			question=question,
-			choice_text="A choice")
+		if votes:
+			choice = Choice.objects.create(
+				question=question,
+				choice_text="A choice",
+				votes=1)
+		else:
+			choice = Choice.objects.create(
+				question=question,
+				choice_text="A choice")
 	return question
 
 def question_builder(number_of_normal_questions,
 					number_of_future_questions=0,
-					number_of_questions_with_no_choices=0):
+					number_of_questions_with_no_choices=0,
+					number_of_questions_with_various_votes=0):
 	question_response_text = []
 	for x in range(number_of_normal_questions):
 		create_question(
@@ -37,6 +44,10 @@ def question_builder(number_of_normal_questions,
 	for x in range(number_of_questions_with_no_choices):
 		create_question(
 			question_text="No choices.", days=-30, have_choice=False)
+	for x in range(number_of_questions_with_various_votes):
+		create_question(
+			question_text="Popular question " + str(x + 1) + ".", days=-30,
+			votes=True)
 	return question_response_text[::-1]
 
 
@@ -136,7 +147,7 @@ class QuestionViewTests(TestCase):
 		self.assertQuerysetEqual(response.context['latest_question_list'], [])
 
 
-class QuestionIndexDetailTests(TestCase):
+class QuestionDetailViewTests(TestCase):
 
 	def test_detail_view_with_a_future_question(self):
 		"""
@@ -172,7 +183,7 @@ class QuestionIndexDetailTests(TestCase):
 		self.assertEqual(response.status_code, 404)
 
 
-class QuestionIndexResultTests(TestCase):
+class QuestionResultViewTests(TestCase):
 
 	def test_results_view_with_a_future_question(self):
 		"""
@@ -208,7 +219,7 @@ class QuestionIndexResultTests(TestCase):
 		self.assertEqual(response.status_code, 404)
 
 
-class QuestionIndexAllTests(TestCase):
+class QuestionAllViewTests(TestCase):
 
 	def test_all_view_with_no_questions(self):
 		"""
@@ -281,3 +292,85 @@ class QuestionIndexAllTests(TestCase):
 		self.assertQuerysetEqual(
 			response.context['full_question_list'],
 			response_text)
+
+
+class QuestionPopularViewTests(TestCase):
+
+	def test_popular_view_with_no_questions(self):
+		"""
+			If no questions exist, an appropriate message should be displayed
+		"""
+		response = self.client.get(reverse('polls:popular'))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "No polls are available.")
+		self.assertQuerysetEqual(response.context['full_question_list'], [])
+
+	def test_popular_view_with_a_past_question(self):
+		"""
+			Questions with a pub_date in the past should be displayed
+			on the popular page
+		"""
+		create_question(question_text="Past question.", days=-30)
+		response = self.client.get(reverse('polls:popular'))
+		self.assertQuerysetEqual(
+			response.context['full_question_list'],
+			['<Question: Past question.>'])
+
+	def test_popular_view_with_a_future_question(self):
+		"""
+			Questions with a pub_date in the future should not be displayed
+			on the popular page
+		"""
+		create_question(question_text="Future question.", days=30)
+		response = self.client.get(reverse('polls:popular'))
+		self.assertContains(response, "No polls are available.")
+		self.assertQuerysetEqual(response.context['full_question_list'], [])
+
+	def test_popular_view_with_future_question_and_past_question(self):
+		"""
+			Even if both past and future questions exist, only past questions
+			should be displayed
+		"""
+		response_text = question_builder(1, number_of_future_questions=1)
+		response = self.client.get(reverse('polls:popular'))
+		self.assertQuerysetEqual(
+			response.context['full_question_list'],
+			response_text)
+
+	def test_popular_view_with_many_past_questions(self):
+		"""
+			The popular page may display multiple questions
+		"""
+		response_text = question_builder(10)
+		response = self.client.get(reverse('polls:popular'))
+		self.assertQuerysetEqual(
+			response.context['full_question_list'],
+			response_text)
+
+	def test_popular_view_with_question_that_has_no_choice(self):
+		"""
+			Questions that do not have at least 1 choice should not
+			be displayed
+		"""
+		create_question(question_text="No choice.", days=-5, have_choice=False)
+		response = self.client.get(reverse('polls:popular'))
+		self.assertContains(response, "No polls are available.")
+		self.assertQuerysetEqual(response.context['full_question_list'], [])
+
+	def test_popular_view_with_many_questions_incl_future_and_choiceless(self):
+		"""
+			Displays past questions, ignores future and
+			choiceless questions
+		"""
+		response_text = question_builder(10, number_of_future_questions=1,
+			number_of_questions_with_no_choices=1)
+		response = self.client.get(reverse('polls:popular'))
+		self.assertQuerysetEqual(
+			response.context['full_question_list'],
+			response_text[:5])
+
+	def test_popular_view_with_many_questions_some_with_votes(self):
+		"""
+			Displays only 5 most popular questions, ignores others
+		"""
+		pass

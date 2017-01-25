@@ -85,7 +85,7 @@ def vote(request, question_id):
 			args=(question.id,)))
 
 
-class AllQuestionsView(generic.ListView): # test needed!!
+class AllQuestionsView(generic.ListView):
 	"""
 		Displays a listing showing all poll questions
 	"""
@@ -103,7 +103,7 @@ class AllQuestionsView(generic.ListView): # test needed!!
 			.filter(pub_date__lte=timezone.now())
 
 
-class PopularView(generic.ListView): # needs test and proper query!!!
+class PopularView(generic.ListView): # needs tests!!!
 	"""
 		Displays a list of the 5 most popular questions
 	"""
