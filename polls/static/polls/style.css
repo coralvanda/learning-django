@@ -13,6 +13,14 @@ nav {
 	flex-wrap: wrap;
 }
 
+.button {
+	background: linear-gradient(white, gray);
+	padding: 2px;
+	margin: 2px 2px 2px 2px;
+	border: 1px solid black;
+	text-align: center;
+}
+
 li a {
 	color: green;
 }
