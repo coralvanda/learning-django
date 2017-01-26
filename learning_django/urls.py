@@ -15,10 +15,9 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from learning-django.home import views
 
 urlpatterns = [
-    url(r'^$', 'home.views.index'),
+    url(r'^$', include('home.urls')),
     url(r'^polls/', include('polls.urls')),
     url(r'^admin/', admin.site.urls),
 ]
