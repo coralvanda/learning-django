@@ -375,4 +375,4 @@ class QuestionPopularViewTests(TestCase):
 			number_of_questions_with_various_votes=5)
 		response = self.client.get(reverse('polls:popular'))
 		self.assertQuerysetEqual(response.context['popular_question_list'],
-			response_text[:5:-1])
+			response_text[:5])
