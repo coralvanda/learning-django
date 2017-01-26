@@ -347,7 +347,7 @@ class QuestionPopularViewTests(TestCase):
 		response = self.client.get(reverse('polls:popular'))
 		self.assertEqual(len(response.context['popular_question_list']), 5)
 		for question in response.context['popular_question_list'].values():
-			self.assertIn(question, response_text)
+			self.assertIn(question.question_text, response_text)
 
 	def test_popular_view_with_question_that_has_no_choice(self):
 		"""
@@ -369,7 +369,7 @@ class QuestionPopularViewTests(TestCase):
 		response = self.client.get(reverse('polls:popular'))
 		self.assertEqual(len(response.context['popular_question_list']), 5)
 		for question in response.context['popular_question_list'].values():
-			self.assertIn(question, response_text)
+			self.assertIn(question.question_text, response_text)
 
 	def test_popular_view_with_many_questions_some_with_votes(self):
 		"""
