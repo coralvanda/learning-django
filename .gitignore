@@ -21,6 +21,14 @@
 /polls/migrations/__init__.pyc
 /polls/migrations/__pycache__/
 
+/home/__init.pyc
+/home/admin.pyc
+/home/apps.pyc
+/home/migrations/__init__.pyc
+/home/models.pyc
+/home/urls.pyc
+/home/views.pyc
+
 db_info.md
 db.sqlite3
 deployment-check.md
