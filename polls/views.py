@@ -104,7 +104,7 @@ class AllQuestionsView(generic.ListView):
 			.order_by('-pub_date')
 
 
-class PopularView(generic.ListView): # needs more tests, some tests don't pass!!!
+class PopularView(generic.ListView):
 	"""
 		Displays a list of the 5 most popular questions
 	"""
