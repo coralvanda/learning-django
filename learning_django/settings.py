@@ -25,14 +25,23 @@ SECRET_KEY = 'PUT SECRET KEY HERE'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ADMINS = (('Eric', 'coralvanda@gmail.com'),)
-
 ALLOWED_HOSTS = ["138.197.26.104", "learning-django.coralvanda.com"]
 
+CSRF_COOKIE_HTTPONLY = True
+
+X_FRAME_OPTIONS = 'DENY'
+
+# Emailing
+
+DEFAULT_FROM_EMAIL = 'django-webmaster@coralvanda.com'
+SERVER_EMAIL = 'learning-django@coralvanda.com'
+
+# ADMINS = (('Eric', 'coralvanda@gmail.com'),)
 
 # Application definition
 
 INSTALLED_APPS = [
+    'home.apps.HomeConfig',
     'polls.apps.PollsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -78,10 +87,10 @@ WSGI_APPLICATION = 'learning_django.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'django_db',
         'USER': 'django_user',
-        'PASSWORD': [INSERT PW HERE],
+        'PASSWORD': '',
         'HOST': '',
         'PORT': '',
     }
