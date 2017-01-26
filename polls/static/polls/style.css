@@ -1,5 +1,8 @@
-#container {
+body{
 	background: white url("images/background.gif") no-repeat right bottom;
+}
+
+#container {
 	margin: auto;
 	max-width: 800px;
 	height: 1000px;
