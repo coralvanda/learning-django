@@ -11,7 +11,9 @@ def create_question(question_text, days, have_choice=True, votes=False):
 		Creates a question with the given 'question_text' and publshed the
 		given number of 'days' offset to now (negative for questions published)
 		in the past, positive for questions that have yet to be published).
-		Automatically creates a choice for each question unless told not to
+		Automatically creates a choice for each question unless told not to.
+		Accepts numbers as an optional 'votes' field, and assigns that
+		number to the question's choice's vote count.
 	"""
 	time = timezone.now() + datetime.timedelta(days=days)
 	question = Question.objects.create(
@@ -21,7 +23,7 @@ def create_question(question_text, days, have_choice=True, votes=False):
 			choice = Choice.objects.create(
 				question=question,
 				choice_text="A choice",
-				votes=1)
+				votes=votes)
 		else:
 			choice = Choice.objects.create(
 				question=question,
@@ -32,6 +34,13 @@ def question_builder(number_of_normal_questions,
 					number_of_future_questions=0,
 					number_of_questions_with_no_choices=0,
 					number_of_questions_with_various_votes=0):
+	"""
+		Creates a specified number of questions, with the option to create
+		questions dated from the future, questions without choices, and
+		questions with varying numbers of votes.  Returns a list of each
+		question created that is dated in the past and has at least one choice,
+		ordered by most recently created.
+	"""
 	question_response_text = []
 	for x in range(number_of_normal_questions):
 		create_question(
@@ -47,7 +56,7 @@ def question_builder(number_of_normal_questions,
 	for x in range(number_of_questions_with_various_votes):
 		create_question(
 			question_text="Popular question " + str(x + 1) + ".", days=-30,
-			votes=True)
+			votes=x + 1)
 		question_response_text.append(
 			"<Question: Popular question " + str(x + 1) + ".>")
 	return question_response_text[::-1]
@@ -346,8 +355,6 @@ class QuestionPopularViewTests(TestCase):
 		response_text = question_builder(10)
 		response = self.client.get(reverse('polls:popular'))
 		self.assertEqual(len(response.context['popular_question_list']), 5)
-		for question in response.context['popular_question_list'].values():
-			self.assertIn(question['question_text'], response_text)
 
 	def test_popular_view_with_question_that_has_no_choice(self):
 		"""
@@ -359,20 +366,13 @@ class QuestionPopularViewTests(TestCase):
 		self.assertContains(response, "No polls are available.")
 		self.assertQuerysetEqual(response.context['popular_question_list'], [])
 
-	def test_popular_view_with_many_questions_incl_future_and_choiceless(self):
-		"""
-			Displays past questions, ignores future and
-			choiceless questions
-		"""
-		response_text = question_builder(10, number_of_future_questions=1,
-			number_of_questions_with_no_choices=1)
-		response = self.client.get(reverse('polls:popular'))
-		self.assertEqual(len(response.context['popular_question_list']), 5)
-		for question in response.context['popular_question_list'].values():
-			self.assertIn(question['question_text'], response_text)
-
 	def test_popular_view_with_many_questions_some_with_votes(self):
 		"""
 			Displays only 5 most popular questions, ignores others
 		"""
-		pass
+		response_text = question_builder(5, number_of_future_questions=1,
+			number_of_questions_with_no_choices=1,
+			number_of_questions_with_various_votes=5)
+		response = self.client.get(reverse('polls:popular'))
+		self.assertQuerysetEqual(response.context['popular_question_list'],
+			response_text[:5:-1])
