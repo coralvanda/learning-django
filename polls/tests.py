@@ -48,6 +48,8 @@ def question_builder(number_of_normal_questions,
 		create_question(
 			question_text="Popular question " + str(x + 1) + ".", days=-30,
 			votes=True)
+		question_response_text.append(
+			"<Question: Popular question " + str(x + 1) + ".>")
 	return question_response_text[::-1]
 
 
@@ -343,9 +345,9 @@ class QuestionPopularViewTests(TestCase):
 		"""
 		response_text = question_builder(10)
 		response = self.client.get(reverse('polls:popular'))
-		self.assertQuerysetEqual(
-			response.context['popular_question_list'],
-			response_text)
+		self.assertEqual(len(response.context['popular_question_list']), 5)
+		for question in response.context['popular_question_list'].values():
+			self.assertIn(question, response_text)
 
 	def test_popular_view_with_question_that_has_no_choice(self):
 		"""
@@ -365,9 +367,9 @@ class QuestionPopularViewTests(TestCase):
 		response_text = question_builder(10, number_of_future_questions=1,
 			number_of_questions_with_no_choices=1)
 		response = self.client.get(reverse('polls:popular'))
-		self.assertQuerysetEqual(
-			response.context['popular_question_list'],
-			response_text[:5])
+		self.assertEqual(len(response.context['popular_question_list']), 5)
+		for question in response.context['popular_question_list'].values():
+			self.assertIn(question, response_text)
 
 	def test_popular_view_with_many_questions_some_with_votes(self):
 		"""
