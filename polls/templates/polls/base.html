@@ -9,9 +9,11 @@
 	href="{% static 'polls/style.css' %}" />
 </head>
 <body>
-	{% include "polls/header.html" %}
+	<div id="container">
+		{% include "polls/header.html" %}
 
-	{% block content %}
-	{% endblock %}
+		{% block content %}
+		{% endblock %}
+	</div>
 </body>
 </html>

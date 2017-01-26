@@ -1,5 +1,8 @@
-html {
+#container {
 	background: white url("images/background.gif") no-repeat right bottom;
+	margin: auto;
+	max-width: 800px;
+	height: 1000px;
 }
 
 header {
